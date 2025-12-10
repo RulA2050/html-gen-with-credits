@@ -83,23 +83,75 @@ class HtmlGenerationController extends Controller
         });
     }
 
+    protected function resolveAssets(HtmlGeneration $generation): array
+    {
+        $library = $generation->library ?? 'tailwind';
+        $logicKeys = $generation->assets ?? [];
+
+        // Default asset berdasarkan library (tailwind/bootstrap + global)
+        $libraryAssets = HtmlAsset::forLibrary($library)->get();
+
+        // Asset tambahan berdasarkan logical_key dari AI (fontawesome, swiper, dll)
+        $logicalAssets = !empty($logicKeys)
+            ? HtmlAsset::forLogicalKeys($logicKeys)->get()
+            : collect();
+
+        // Gabung, unique, sort sesuai sort_order
+        $assets = $libraryAssets
+            ->merge($logicalAssets)
+            ->unique('id')
+            ->sortBy('sort_order')
+            ->values();
+
+        return [
+            'headCss' => $assets->where('type', 'css')->where('position', 'head')->values(),
+            'headJs' => $assets->where('type', 'js')->where('position', 'head')->values(),
+            'bodyJs' => $assets->where('type', 'js')->where('position', 'body_end')->values(),
+        ];
+    }
+    public function preview(HtmlGeneration $generation)
+    {
+        $this->authorizeView($generation);
+
+        $assetGroups = $this->resolveAssets($generation);
+
+        return response()->view('generations.preview', [
+            'title' => $generation->title,
+            'html' => $generation->html_full ?? '',
+            'css' => $generation->css_raw ?? '',
+            'js' => $generation->js_raw ?? '',
+            'headCss' => $assetGroups['headCss'],
+            'headJs' => $assetGroups['headJs'],
+            'bodyJs' => $assetGroups['bodyJs'],
+        ]);
+    }
+
     public function edit(HtmlGeneration $generation)
     {
         $this->authorizeView($generation);
 
-        $assets = HtmlAsset::forLibrary($generation->library)->get();
+        $assetGroups = $this->resolveAssets($generation);
 
-        $headCss = $assets->where('type', 'css')->where('position', 'head')->values();
-        $headJs = $assets->where('type', 'js')->where('position', 'head')->values();
-        $bodyJs = $assets->where('type', 'js')->where('position', 'body_end')->values();
+        $headCss = $assetGroups['headCss'];
+        $headJs = $assetGroups['headJs'];
+        $bodyJs = $assetGroups['bodyJs'];
 
         return view('generations.edit', [
             'generation' => $generation,
-            'headCss' => $headCss,
-            'headJs' => $headJs,
-            'bodyJs' => $bodyJs,
+            'schema' => $generation->editor_schema['editableFields'] ?? [],
+            'headCssUrls' => $headCss->pluck('url')->values()->all(),
+            'headJsUrls' => $headJs->pluck('url')->values()->all(),
+            'bodyJsUrls' => $bodyJs->pluck('url')->values()->all(),
+            'activeAssetNames' => $headCss->pluck('name')
+                ->merge($headJs->pluck('name'))
+                ->merge($bodyJs->pluck('name'))
+                ->unique()
+                ->values()
+                ->all(),
         ]);
     }
+
+
 
     public function update(Request $request, HtmlGeneration $generation)
     {
@@ -113,33 +165,10 @@ class HtmlGenerationController extends Controller
 
         $generation->update($data);
 
-        return back()->with('status', 'Perubahan tersimpan.');
+        return redirect()
+            ->route('generations.edit', $generation)
+            ->with('status', 'Halaman berhasil diperbarui.');
     }
-
-    public function preview(HtmlGeneration $generation)
-    {
-        $this->authorizeView($generation);
-
-        $library = $generation->library;
-
-        $assets = HtmlAsset::forLibrary($library)->get();
-
-        $headCss = $assets->where('type', 'css')->where('position', 'head');
-        $headJs = $assets->where('type', 'js')->where('position', 'head');
-        $bodyJs = $assets->where('type', 'js')->where('position', 'body_end');
-
-        return response()->view('generations.preview', [
-            'title' => $generation->title,
-            'html' => $generation->html_full ?? '',
-            'css' => $generation->css_raw ?? '',
-            'js' => $generation->js_raw ?? '',
-            'library' => $library,
-            'headCss' => $headCss,
-            'headJs' => $headJs,
-            'bodyJs' => $bodyJs,
-        ]);
-    }
-
     protected function authorizeView(HtmlGeneration $generation): void
     {
         if ($generation->user_id !== Auth::id()) {

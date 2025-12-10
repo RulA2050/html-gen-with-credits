@@ -9,15 +9,15 @@ class WhatsAppService
 {
     public function __construct(
         protected ?string $secret = null,
-        protected ?array $clientIds = null,
+        protected ?string $clientIds = null,
     ) {
         $this->secret = $this->secret ?: config('services.wacserv.secret');
-        $this->clientIds = $this->clientIds ?: config('services.wacserv.client_ids', []);
+        $this->clientIds = $this->clientIds ?: config('services.wacserv.client_id');
     }
 
     public function sendMessage(int|string $userId, string $phoneNumber, string $message, ?string $clientId = null): void
     {
-        $clientId = $clientId ?: ($this->clientIds[0] ?? null);
+        $clientId = $clientId ?: ($this->clientIds ?? null);
 
         if (! $clientId || ! $this->secret) {
             throw new \RuntimeException('WA config missing.');
@@ -28,13 +28,13 @@ class WhatsAppService
         $payload = [
             'user_id' => $userId,
             'role' => 'ci4',
-            'client_ids' => [$clientId],
+            'client_ids' => $clientId,
             'iat' => $now,
             'exp' => $now + 60 * 5,
         ];
 
         $jwt = JWT::encode($payload, $this->secret, 'HS256');
-
+        $jwt = "Bearer {$jwt}";
         $url = "https://wacserv.usaha-ku.com/api/fitur/{$clientId}/send-message";
 
         $response = Http::withHeaders([
@@ -46,8 +46,11 @@ class WhatsAppService
 
         if ($response->failed()) {
             throw new \RuntimeException(
-                'Failed to send WA message: ' . $response->status() . ' - ' . $response->body()
+                'Failed to send WA message: ' . $response->status() . ' - ' . $response->body() . ' - Client ID' . $clientId
             );
+        }
+        if($response->successful()){
+            Log::info('wa message sent successfully to '.$phoneNumber.' with client id '.$clientId);
         }
     }
 }

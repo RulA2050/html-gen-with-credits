@@ -49,7 +49,7 @@ class GenerateHtmlJob implements ShouldQueue
         try {
             $endpoint = config('services.n8n.generate_html_url');
 
-            $response = Http::withHeader('Authorization', $authorization)->timeout(60)->post($endpoint, [
+            $response = Http::withHeader('Authorization', $authorization)->timeout(500)->post($endpoint, [
                 'title' => $generation->title,
                 'library' => $generation->library,
                 'form_payload' => $generation->form_payload,

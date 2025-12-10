@@ -2,14 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Preview - {{ $title }}</title>
+    <title>{{ $title ?? 'Generated Page' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{-- CSS & JS CDN di HEAD --}}
+    {{-- CDN CSS di HEAD (bootstrap, swiper css, fontawesome, dll) --}}
     @foreach ($headCss as $asset)
         <link rel="stylesheet" href="{{ $asset->url }}">
     @endforeach
 
+    {{-- CDN JS di HEAD kalau ada (tailwind cdn, dll) --}}
     @foreach ($headJs as $asset)
         <script src="{{ $asset->url }}"></script>
     @endforeach
@@ -24,7 +25,7 @@
 <body>
     {!! $html !!}
 
-    {{-- JS CDN di akhir body --}}
+    {{-- CDN JS di akhir body (bootstrap bundle, swiper, aos, gsap, dll) --}}
     @foreach ($bodyJs as $asset)
         <script src="{{ $asset->url }}"></script>
     @endforeach

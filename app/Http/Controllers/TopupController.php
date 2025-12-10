@@ -58,7 +58,7 @@ class TopupController extends Controller
             . "Silakan forward pesan ini ke Admin untuk instruksi pembayaran.\n\n"
             ;
 
-        $clientId = config('services.wacserv.client_ids')[0] ?? null;
+        $clientId = config('services.wacserv.client_id');
 
         try {
             if ($clientId) {
@@ -73,6 +73,7 @@ class TopupController extends Controller
         } catch (\Throwable $e) {
             // Log the error but don't block the user
             \Log::error('Failed to send WA message for topup: ' . $e->getMessage());
+
         }
 
         return redirect()

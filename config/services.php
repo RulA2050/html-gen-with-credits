@@ -36,8 +36,8 @@ return [
     ],
     'wacserv' => [
         'secret' => env('WACSERV_SECRET'),
-        'client_ids' => env('WACSERV_CLIENT_IDS'),
-        'admin_phone' => env('WACSERV_ADMIN_PHONE'),
+        'client_id' => env('WACSERV_CLIENT_ID'),
+        'admin_phone_number' => env('WACSERV_ADMIN_PHONE'),
 
     ],
     'n8n' => [
