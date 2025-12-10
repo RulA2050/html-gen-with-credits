@@ -34,5 +34,15 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'wacserv' => [
+        'secret' => env('WACSERV_SECRET'),
+        'client_ids' => env('WACSERV_CLIENT_IDS'),
+        'admin_phone' => env('WACSERV_ADMIN_PHONE'),
+
+    ],
+    'n8n' => [
+        'generate_html_url' =>  env('N8N_GENERATE_HTML_URL'),
+        'secret' => env('N8N_SECRTET_KEY'),
+    ],
 
 ];

@@ -21,11 +21,13 @@ class HtmlGeneration extends Model
         'js_raw',
         'editor_schema',
         'error_message',
+        'assets',
     ];
 
     protected $casts = [
         'form_payload' => 'array',
         'editor_schema' => 'array',
+        'assets'         => 'array',
     ];
 
     public function user()

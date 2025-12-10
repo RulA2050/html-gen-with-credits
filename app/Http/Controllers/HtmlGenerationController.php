@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\GenerateHtmlJob;
 use App\Models\HtmlGeneration;
+use App\Models\HtmlAsset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -86,7 +87,18 @@ class HtmlGenerationController extends Controller
     {
         $this->authorizeView($generation);
 
-        return view('generations.edit', compact('generation'));
+        $assets = HtmlAsset::forLibrary($generation->library)->get();
+
+        $headCss = $assets->where('type', 'css')->where('position', 'head')->values();
+        $headJs = $assets->where('type', 'js')->where('position', 'head')->values();
+        $bodyJs = $assets->where('type', 'js')->where('position', 'body_end')->values();
+
+        return view('generations.edit', [
+            'generation' => $generation,
+            'headCss' => $headCss,
+            'headJs' => $headJs,
+            'bodyJs' => $bodyJs,
+        ]);
     }
 
     public function update(Request $request, HtmlGeneration $generation)
@@ -108,11 +120,24 @@ class HtmlGenerationController extends Controller
     {
         $this->authorizeView($generation);
 
-        $html = $generation->html_full ?? '';
-        $css = $generation->css_raw ?? '';
-        $js = $generation->js_raw ?? '';
+        $library = $generation->library;
 
-        return response()->view('generations.preview', compact('html', 'css', 'js'));
+        $assets = HtmlAsset::forLibrary($library)->get();
+
+        $headCss = $assets->where('type', 'css')->where('position', 'head');
+        $headJs = $assets->where('type', 'js')->where('position', 'head');
+        $bodyJs = $assets->where('type', 'js')->where('position', 'body_end');
+
+        return response()->view('generations.preview', [
+            'title' => $generation->title,
+            'html' => $generation->html_full ?? '',
+            'css' => $generation->css_raw ?? '',
+            'js' => $generation->js_raw ?? '',
+            'library' => $library,
+            'headCss' => $headCss,
+            'headJs' => $headJs,
+            'bodyJs' => $bodyJs,
+        ]);
     }
 
     protected function authorizeView(HtmlGeneration $generation): void
