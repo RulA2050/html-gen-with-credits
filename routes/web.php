@@ -3,16 +3,20 @@
 use App\Http\Controllers\TopupController;
 use App\Http\Controllers\HtmlGenerationController;
 use App\Http\Controllers\Admin\TopupAdminController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+Route::middleware(['auth', 'phone.verified'])->group(function () {
+
+
+    Route::get('/dashboard', DashboardController::class)
+        ->middleware(['auth'])
+        ->name('dashboard');
+
 
     // Topup (user)
     Route::get('/topups', [TopupController::class, 'index'])->name('topups.index');
@@ -35,4 +39,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

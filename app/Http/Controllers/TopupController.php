@@ -9,8 +9,18 @@ use Illuminate\Support\Facades\Auth;
 
 class TopupController extends Controller
 {
+    protected $pricePoints ;
+    protected $usingPoints ;
+
+    public function __construct()
+    {
+        $this->pricePoints = config('app.price_points', 50000);
+        $this->usingPoints = config('app.using_points', 5);
+    }
+
     public function index()
     {
+
         $topups = Auth::user()
             ->topups()
             ->latest()
@@ -21,7 +31,10 @@ class TopupController extends Controller
 
     public function create()
     {
-        return view('topups.create');
+        $pricePoints = $this->pricePoints;
+        $usingPoints = $this->usingPoints;
+        $phoneNumber = Auth::user()->phone_number;
+        return view('topups.create', compact('pricePoints', 'usingPoints', 'phoneNumber'));
     }
 
     public function store(Request $request, WhatsAppService $wa)
@@ -34,15 +47,20 @@ class TopupController extends Controller
             $adminPhoneNumber = '62' . $adminPhoneNumber;
         }
         $data = $request->validate([
-            'phone_number' => 'required|string|max:20',
-            'amount_points' => 'required|integer|min:1',
+            'amount_points' => 'required|integer|min:3',
         ]);
+        $usingPoints = $this->usingPoints;
+        // Cek Amout poin harus kelipatan 3
+        if ($data['amount_points'] % $usingPoints !== 0) {
+            return back()->withErrors(['amount_points' => 'Jumlah poin harus kelipatan 3.'])->withInput();
+        }
+
 
         $user = Auth::user();
 
         $topup = TopupTransaction::create([
             'user_id' => $user->id,
-            'phone_number' => $data['phone_number'],
+            'phone_number' => $user->phone_number,
             'amount_points' => $data['amount_points'],
             'status' => 'PENDING',
         ]);
@@ -51,9 +69,10 @@ class TopupController extends Controller
             . "User ID: {$user->id}\n"
             . "Nama: {$user->name}\n"
             . "Email: {$user->email}\n"
-            . "Nomor HP: {$data['phone_number']}\n"
+            . "Nomor HP: {$user->phone_number}\n"
             . "Paket: {$data['amount_points']} poin\n"
-            . "Kode Transaksi: T{$topup->id}\n\n"
+            . "Kode Transaksi: RXGT#TU#{$topup->id}\n\n"
+            . 'Silakan lakukan pembayaran sebesar Rp ' . number_format($data['amount_points'] * $this->pricePoints / $this->usingPoints, 0, ',', '.') . "\n"
             . "Nomor Admin: {$adminPhoneNumber}\n"
             . "Silakan forward pesan ini ke Admin untuk instruksi pembayaran.\n\n"
             ;
@@ -62,7 +81,7 @@ class TopupController extends Controller
 
         try {
             if ($clientId) {
-                $wa->sendMessage($user->id, $data['phone_number'], $message, $clientId);
+                $wa->sendMessage($user->id, $user->phone_number, $message, $clientId);
 
                 $topup->update([
                     'status' => 'WAITING_PAYMENT',

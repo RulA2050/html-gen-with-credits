@@ -38,11 +38,15 @@ return [
         'secret' => env('WACSERV_SECRET'),
         'client_id' => env('WACSERV_CLIENT_ID'),
         'admin_phone_number' => env('WACSERV_ADMIN_PHONE'),
+        'api_url' => env('WACSERV_API_URL', 'https://wacserv.usaha-ku.com/api'),
 
     ],
     'n8n' => [
         'generate_html_url' =>  env('N8N_GENERATE_HTML_URL'),
         'secret' => env('N8N_SECRTET_KEY'),
     ],
+
+    'price_points' => env('PRICE_POINTS', 50000), // Harga per 5 poin
+    'using_points' => env('USING_POINTS', 3), // Poin yang
 
 ];

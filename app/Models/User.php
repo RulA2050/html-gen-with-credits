@@ -1,12 +1,12 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -17,15 +17,21 @@ class User extends Authenticatable implements MustVerifyEmail
         'role',
         'phone_number',
         'points',
+        'phone_verified_at',
+        'phone_verification_code',
+        'phone_verification_expires_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'phone_verification_code',
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at'             => 'datetime',
+        'phone_verified_at'             => 'datetime',
+        'phone_verification_expires_at' => 'datetime',
     ];
 
     public function isAdmin(): bool
@@ -43,4 +49,3 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(HtmlGeneration::class);
     }
 }
-
