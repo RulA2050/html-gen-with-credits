@@ -30,6 +30,9 @@ Route::middleware(['auth', 'phone.verified'])->group(function () {
     Route::get('/generations/{generation}/edit', [HtmlGenerationController::class, 'edit'])->name('generations.edit');
     Route::put('/generations/{generation}', [HtmlGenerationController::class, 'update'])->name('generations.update');
     Route::get('/generations/{generation}/preview', [HtmlGenerationController::class, 'preview'])->name('generations.preview');
+
+    // Publish HTML
+    Route::post('/generations/{htmlGeneration}/export', [App\Http\Controllers\PublishHtmlController::class, 'export'])->name('generations.export');
 });
 
 // Admin

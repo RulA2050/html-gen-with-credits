@@ -146,6 +146,16 @@
                                                 </svg>
                                                 Preview
                                             </a>
+                                            <form action="{{ route('generations.export', $item) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-600 hover:border-emerald-500 hover:text-emerald-400 text-xs font-medium transition-all">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Export HTML
+                                                </button>
+                                            </form>
                                         @endif
                                         @if (in_array($item->status, ['WAITING','GENERATING']))
                                             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-700/50 text-xs text-slate-400">
@@ -157,6 +167,7 @@
                                         @endif
                                         @if ($item->status === 'FAILED')
                                             <div class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                                                {{-- SVG Unduh --}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
