@@ -51,7 +51,7 @@ class HtmlGenerationController extends Controller
         }
 
         return DB::transaction(function () use ($user, $data) {
-            $user->decrement('points');
+            $user->decrement('points', 3);
 
             $formPayload = [
                 'use_case' => $data['use_case'],

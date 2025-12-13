@@ -74,7 +74,7 @@ class TopupController extends Controller
             . "Kode Transaksi: RXGT#TU#{$topup->id}\n\n"
             . 'Silakan lakukan pembayaran sebesar Rp ' . number_format($data['amount_points'] * $this->pricePoints / $this->usingPoints, 0, ',', '.') . "\n"
             . "Nomor Admin: {$adminPhoneNumber}\n"
-            . "Silakan forward pesan ini ke Admin untuk instruksi pembayaran.\n\n"
+            . "Silakan forward pesan ini ke Admin untuk instruksi pembayaran."
             ;
 
         $clientId = config('services.wacserv.client_id');

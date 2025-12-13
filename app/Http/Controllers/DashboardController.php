@@ -107,6 +107,7 @@ class DashboardController extends Controller
         } else {
             $errorCount = 0;
         }
+        $errorCount += HtmlGeneration::where('status', 'FAILED')->count();
 
         /**
          * ========================

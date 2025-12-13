@@ -1,104 +1,257 @@
-{{-- resources/views/layouts/guest.blade.php --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ $title ?? 'HTML Generator' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <style>
+        /* Custom animations and styles */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#EDEDEC]">
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
 
-        <div class="min-h-screen flex lg:grid lg:grid-cols-2">
+        .glass-effect {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
 
-            {{-- Left Side: Branding & Visual (Hidden on Mobile) --}}
-            <div class="hidden lg:flex flex-col items-center justify-center relative border-r border-[#e3e3e0] dark:border-[#3E3E3A] bg-[#FDFDFC] dark:bg-[#0a0a0a] overflow-hidden">
-                {{-- Decorative Pattern (Dots) --}}
-                <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-                     style="background-image: radial-gradient(#1b1b18 1px, transparent 1px); background-size: 24px 24px;">
-                </div>
+        .gradient-border {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 1px;
+        }
 
-                {{-- Centered Logo --}}
-                <div class="relative z-10 flex flex-col items-center gap-6">
-                    <a href="{{ url('/') }}" class="inline-flex flex-col items-center gap-4 group">
-                        <span class="inline-flex h-20 w-20 rounded-2xl bg-[#fff2f2] dark:bg-[#1D0002] items-center justify-center ring-1 ring-[#e3e3e0] dark:ring-[#3E3E3A] shadow-sm group-hover:scale-105 transition-transform duration-300">
-                            <span class="h-5 w-5 rounded-full bg-[#F53003] dark:bg-[#F61500]"></span>
-                        </span>
-                        <span class="text-3xl font-bold tracking-tight text-[#1b1b18] dark:text-[#EDEDEC]">
-                            {{ config('app.name', 'Laravel') }}
-                        </span>
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .logout-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .logout-btn:hover::before {
+            left: 100%;
+        }
+
+        .message-animation {
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .bg-pattern {
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 20%);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen bg-pattern">
+    <div class="min-h-screen flex flex-col">
+        <!-- Enhanced Header -->
+        <header class="glass-effect border-b border-slate-800/50 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo/Brand -->
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
+                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">HTML Generator</span>
+                            <p class="text-xs text-slate-500">Create Amazing Content</p>
+                        </div>
                     </a>
+
+                    @auth
+                        <!-- Navigation -->
+                        <nav class="hidden md:flex items-center gap-6">
+                            <a href="{{ route('generations.index') }}" class="nav-link text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generate
+                            </a>
+                            <a href="{{ route('topups.index') }}" class="nav-link text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Topup
+                            </a>
+
+                            @if (auth()->user()->isAdmin())
+                                <a href="{{ route('admin.topups.index') }}" class="nav-link text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Admin
+                                </a>
+                            @endif
+                        </nav>
+
+                        <!-- User Section -->
+                        <div class="flex items-center gap-4">
+                            <!-- Points Badge -->
+                            <div class="points-badge px-3 py-1.5 rounded-full flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                </svg>
+                                <span class="text-sm font-bold text-white">{{ number_format(auth()->user()->points) }}</span>
+                                <span class="text-xs text-white/80">PTS</span>
+                            </div>
+
+                            <!-- User Avatar (Optional) -->
+                            <div class="hidden sm:block">
+                                <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            </div>
+
+                            <!-- Logout Button -->
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                                @csrf
+                                <button
+                                    type="submit"
+                                    class="logout-btn px-4 py-2 rounded-lg border border-red-500/30 text-sm font-medium text-red-400 hover:border-red-500 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    @endauth
                 </div>
             </div>
 
-            {{-- Right Side: Content & Form --}}
-            <div class="w-full flex flex-col h-screen overflow-y-auto">
-                {{-- Header / Navigation --}}
-                <header class="w-full px-6 py-6 flex items-center justify-between lg:justify-end shrink-0">
-
-                    {{-- Mobile Logo (Visible only on small screens) --}}
-                    <div class="lg:hidden">
-                        <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
-                            <span class="inline-flex h-9 w-9 rounded-lg bg-[#fff2f2] dark:bg-[#1D0002] items-center justify-center ring-1 ring-[#e3e3e0] dark:ring-[#3E3E3A]">
-                                <span class="h-2.5 w-2.5 rounded-full bg-[#F53003] dark:bg-[#F61500]"></span>
-                            </span>
-                            <span class="text-base font-bold tracking-tight">
-                                {{ config('app.name', 'Laravel') }}
-                            </span>
+            <!-- Mobile Navigation -->
+            @auth
+                <div class="md:hidden border-t border-slate-800/50">
+                    <nav class="flex justify-around py-2">
+                        <a href="{{ route('generations.index') }}" class="flex flex-col items-center gap-1 py-2 px-3 text-xs text-slate-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Generate
                         </a>
-                    </div>
+                        <a href="{{ route('topups.index') }}" class="flex flex-col items-center gap-1 py-2 px-3 text-xs text-slate-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Topup
+                        </a>
+                        @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.topups.index') }}" class="flex flex-col items-center gap-1 py-2 px-3 text-xs text-slate-400 hover:text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Admin
+                            </a>
+                        @endif
+                    </nav>
+                </div>
+            @endauth
+        </header>
 
-                    {{-- Auth Links --}}
-                    @if (Route::has('login'))
-                        <nav class="flex items-center gap-3 text-xs font-medium">
-                            @auth
-                                <a href="{{ url('/dashboard') }}" class="px-4 py-2 rounded-md hover:bg-[#e3e3e0] dark:hover:bg-[#3E3E3A] transition">
-                                    Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}" class="px-4 py-2 rounded-md hover:bg-[#e3e3e0] dark:hover:bg-[#3E3E3A] transition text-[#1b1b18] dark:text-[#EDEDEC]">
-                                    Log in
-                                </a>
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="px-4 py-2 rounded-md border border-[#e3e3e0] dark:border-[#3E3E3A] hover:bg-[#fafafa] dark:hover:bg-[#161615] transition">
-                                        Register
-                                    </a>
-                                @endif
-                            @endauth
-                        </nav>
-                    @endif
-                </header>
-
-                {{-- Main Form Area --}}
-                <main class="flex-1 flex items-center justify-center px-6 py-8">
-                    <div class="w-full max-w-[420px]">
-
-                        {{-- Welcome Text for Mobile --}}
-                        <div class="lg:hidden mb-8 text-center">
-                            <h2 class="text-2xl font-semibold mb-2 text-[#1b1b18] dark:text-[#EDEDEC]">Welcome back</h2>
-                            <p class="text-[#706f6c] dark:text-[#A1A09A] text-sm">Please enter your details to sign in.</p>
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Session Messages -->
+                @if (session('status'))
+                    <div class="message-animation mb-6 rounded-xl border border-emerald-500/40 bg-emerald-500/10 backdrop-blur-sm px-6 py-4 flex items-center gap-3">
+                        <div class="flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                         </div>
-
-                        {{-- Card Slot --}}
-                        <div class="bg-white dark:bg-[#161615] rounded-2xl shadow-[0px_0px_1px_rgba(0,0,0,0.03),0px_10px_30px_rgba(0,0,0,0.08)] border border-[#e3e3e0] dark:border-[#3E3E3A] p-6 sm:p-8">
-                            {{ $slot }}
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-emerald-300">{{ session('status') }}</p>
                         </div>
                     </div>
-                </main>
+                @endif
 
-                {{-- Footer --}}
-                <footer class="py-6 text-[11px] text-center text-[#706f6c] dark:text-[#A1A09A] shrink-0">
-                    © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-                </footer>
+                @if (session('error'))
+                    <div class="message-animation mb-6 rounded-xl border border-red-500/40 bg-red-500/10 backdrop-blur-sm px-6 py-4 flex items-center gap-3">
+                        <div class="flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-red-300">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Content Slot -->
+                <div class="slide-down px-3">
+                    {{ $slot ?? '' }}
+                    @yield('content')
+                </div>
             </div>
-        </div>
-    </body>
+        </main>
+
+        <!-- Footer (Optional) -->
+        <footer class="border-t border-slate-800/50 glass-effect">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-slate-500">© {{ date('Y') }} HTML Generator. All rights reserved.</p>
+                    <div class="flex items-center gap-4">
+                        <a href="#" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">Help</a>
+                        <a href="#" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">Privacy</a>
+                        <a href="#" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">Terms</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    @stack('scripts')
+</body>
 </html>

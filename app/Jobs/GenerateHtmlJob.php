@@ -25,11 +25,20 @@ class GenerateHtmlJob implements ShouldQueue
         $this->secret = $this->secret ?: config('services.n8n.secret');
     }
 
+    private function logError(HtmlGeneration $generation, \Throwable $e): void
+    {
+        $generation->user->increment('points', 3);
+
+        $generation->update([
+            'status' => 'FAILED',
+            'error_message' => $e->getMessage(),
+        ]);
+    }
     public function handle(): void
     {
         $generation = HtmlGeneration::find($this->generationId);
 
-        if (! $generation || $generation->status !== 'WAITING') {
+        if (!$generation || $generation->status !== 'WAITING') {
             return;
         }
 
@@ -59,6 +68,9 @@ class GenerateHtmlJob implements ShouldQueue
             if ($response->failed()) {
                 throw new \RuntimeException("n8n error: {$response->status()}");
             }
+            if (! $response->successful()) {
+                throw new \RuntimeException('n8n request was not successful.');
+            }
 
             $data = $response->json();
 
@@ -67,15 +79,12 @@ class GenerateHtmlJob implements ShouldQueue
                 'html_full' => $data['html'] ?? null,
                 'css_raw' => $data['css'] ?? null,
                 'js_raw' => $data['js'] ?? null,
-                'assets'        => $data['assets'] ?? [],
+                'assets' => $data['assets'] ?? [],
                 'editor_schema' => $data['editor_schema'] ?? null,
                 'error_message' => null,
             ]);
         } catch (\Throwable $e) {
-            $generation->update([
-                'status' => 'FAILED',
-                'error_message' => $e->getMessage(),
-            ]);
+            $this->logError($generation, $e);
         }
     }
 }
