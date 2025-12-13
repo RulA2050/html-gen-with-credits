@@ -36,9 +36,10 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'unique:users,email'],
             'phone_number' => ['required', 'string', 'min:10', 'max:20', 'unique:users,phone_number'],
             'password' => ['required', 'confirmed', 'min:8'],
-            // 'email'     => ['nullable', 'email', 'max:255', 'unique:users,email'], // opsional aja
+
         ]);
 
         $user = User::create([
@@ -47,7 +48,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email ?? null,
             'password' => Hash::make($request->password),
             'role' => 'USER',
-            'points' => 0,
+            'points' => 6,
         ]);
 
         // generate OTP 6 digit

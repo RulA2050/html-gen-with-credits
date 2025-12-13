@@ -5,7 +5,7 @@ namespace App\Services;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Http;
 
-class WhatsAppService
+class WhatsappService
 {
     public function __construct(
         protected ?string $secret = null,

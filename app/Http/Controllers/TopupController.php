@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TopupTransaction;
-use App\Services\WhatsAppService;
+use App\Services\WhatsappService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,7 +37,7 @@ class TopupController extends Controller
         return view('topups.create', compact('pricePoints', 'usingPoints', 'phoneNumber'));
     }
 
-    public function store(Request $request, WhatsAppService $wa)
+    public function store(Request $request, WhatsappService $wa)
     {
         $adminPhoneNumber = config('services.wacserv.admin_phone_number');
         $adminPhoneNumber = preg_replace('/\D/', '', $adminPhoneNumber);
@@ -97,6 +97,6 @@ class TopupController extends Controller
 
         return redirect()
             ->route('topups.index')
-            ->with('status', 'Permintaan topup dibuat. Cek WhatsApp dan teruskan pesan ke admin.');
+            ->with('status', 'Permintaan topup dibuat. Cek Whatsapp dan teruskan pesan ke admin.');
     }
 }
