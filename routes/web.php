@@ -33,6 +33,8 @@ Route::middleware(['auth', 'phone.verified'])->group(function () {
 
     // Publish HTML
     Route::post('/generations/{htmlGeneration}/export', [App\Http\Controllers\PublishHtmlController::class, 'export'])->name('generations.export');
+    Route::post('/generations/{htmlGeneration}/publish', [App\Http\Controllers\PublishHtmlController::class, 'publish'])->name('generations.publish');
+    Route::get('/publishes/{htmlGeneration}/status', [App\Http\Controllers\PublishHtmlController::class, 'viewPublishStatus'])->name('publishes.status');
 });
 
 // Admin

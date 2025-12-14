@@ -44,6 +44,7 @@ return [
     'n8n' => [
         'generate_html_url' =>  env('N8N_GENERATE_HTML_URL'),
         'secret' => env('N8N_SECRTET_KEY'),
+        'publish_url' => env('N8N_PUBLISH_WEB_URL'),
     ],
 
     'price_points' => env('PRICE_POINTS', 50000), // Harga per 5 poin

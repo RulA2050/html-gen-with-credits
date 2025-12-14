@@ -15,6 +15,7 @@ class HtmlGenerationController extends Controller
     {
         $generations = Auth::user()
             ->generations()
+            ->with('publishHtml')
             ->latest()
             ->paginate(10);
 

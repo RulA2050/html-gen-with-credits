@@ -34,5 +34,10 @@ class HtmlGeneration extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function publishHtml()
+    {
+        return $this->hasOne(PublishHtml::class, 'html_generation_id');
+    }
 }
 

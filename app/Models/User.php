@@ -48,4 +48,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(HtmlGeneration::class);
     }
+
+    public function publishes()
+    {
+        return $this->hasManyThrough(
+            PublishHtml::class,
+            HtmlGeneration::class,
+            'user_id', // Foreign key on HtmlGeneration table
+            'html_generation_id', // Foreign key on PublishHtml table
+            'id', // Local key on User table
+            'id'  // Local key on HtmlGeneration table
+        );
+    }
 }

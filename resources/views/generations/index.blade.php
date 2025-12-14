@@ -146,6 +146,58 @@
                                                 </svg>
                                                 Preview
                                             </a>
+
+                                            {{-- Publish or Status Button --}}
+                                            @php
+                                                $hasPublishHtml = $item->publishHtml;
+                                                $publishStatus = $hasPublishHtml ? $item->publishHtml->status : null;
+                                                $isPublishing = in_array($publishStatus, ['PREPARING_PUBLISH', 'PUBLISHED', 'PENDING']);
+                                            @endphp
+
+                                            @if ($isPublishing)
+                                                {{-- Status Button --}}
+                                                @php
+                                                    $publishStatusConfig = [
+                                                        'PREPARING_PUBLISH' => [
+                                                            'color' => 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                                                            'text' => 'Menyiapkan...',
+                                                            'icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+                                                        ],
+                                                        'PUBLISHED' => [
+                                                            'color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                                                            'text' => 'Published',
+                                                            'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                                                        ],
+                                                        'PENDING' => [
+                                                            'color' => 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+                                                            'text' => 'Pending',
+                                                            'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+                                                        ],
+                                                    ];
+                                                    $publishStatusData = $publishStatusConfig[$publishStatus] ?? [
+                                                        'color' => 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+                                                        'text' => 'Unknown',
+                                                        'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+                                                    ];
+                                                @endphp
+                                                <a href="{{ route('publishes.status', $item) }}"
+                                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border {{ $publishStatusData['color'] }} text-xs font-medium transition-all hover:opacity-80">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $publishStatusData['icon'] }}" />
+                                                    </svg>
+                                                    {{ $publishStatusData['text'] }}
+                                                </a>
+                                            @else
+                                                {{-- Publish Button --}}
+                                                <button onclick="openPublishModal('{{ $item->id }}')"
+                                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-600 hover:border-green-500 hover:text-green-400 text-xs font-medium transition-all">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 2.943-9.543 7a9.97 9.97 0 011.827 3.342M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                    Publish
+                                                </button>
+                                            @endif
+
                                             <form action="{{ route('generations.export', $item) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"
@@ -189,4 +241,64 @@
         </div>
     @endif
 </div>
+
+<!-- Publish Modal -->
+<div id="publishModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-md mx-4">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-white flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 2.943-9.543 7a9.97 9.97 0 011.827 3.342M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Publish Halaman
+            </h3>
+            <button onclick="closePublishModal()" class="text-slate-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="publishForm" action="" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="slug" class="block text-sm font-medium text-slate-300 mb-2">Slug URL</label>
+                <div class="flex items-center">
+                    <span class="bg-slate-700 text-slate-300 px-3 py-2 rounded-l-lg text-sm">https://web.ruxla.id/</span>
+                    <input type="text" id="slug" name="slug" required
+                           class="flex-1 px-3 py-2 bg-slate-700 text-white rounded-r-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                           placeholder="nama-halaman">
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Gunakan huruf kecil, angka, dan tanda hubung (-) saja</p>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closePublishModal()"
+                        class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all">
+                    Publish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentItemId = null;
+
+    function openPublishModal(itemId) {
+        currentItemId = itemId;
+        document.getElementById('publishForm').action = `/generations/${itemId}/publish`;
+        document.getElementById('publishModal').style.display = 'flex';
+    }
+
+    function closePublishModal() {
+        document.getElementById('publishModal').style.display = 'none';
+        document.getElementById('slug').value = '';
+        currentItemId = null;
+    }
+</script>
 @endsection
