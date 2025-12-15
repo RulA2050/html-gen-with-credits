@@ -47,9 +47,10 @@ class HtmlGenerationController extends Controller
 
         $user = Auth::user();
 
-        if ($user->points <= 0) {
+        if ($user->points <= 0 || ($user->points - 3) < 0 ) {
             return back()->with('error', 'Poin kamu habis, silakan topup dulu.');
         }
+        
 
         return DB::transaction(function () use ($user, $data) {
             $user->decrement('points', 3);

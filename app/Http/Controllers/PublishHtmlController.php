@@ -13,13 +13,15 @@ class PublishHtmlController extends Controller
 {
 
     protected function limitDays(HtmlGeneration $htmlGeneration){
-        $this->authorizeView($htmlGeneration);
 
         // Cek apakah sudah ada publish_html terkait
         $publishHtml = PublishHtml::where('html_generation_id', $htmlGeneration->id)->first();
         // Jika sudah ada cek kapan terakhir di edit / dibuat Rate Limit export (1x24 jam)
         if ($publishHtml) {
-            $lastUpdated = $publishHtml->updated_at ?? $publishHtml->created_at;
+            $lastUpdated = $publishHtml->updated_at ?? null;
+            if($lastUpdated == null){
+                return true;
+            }
             $hoursSinceUpdate = now()->diffInHours($lastUpdated);
             if ($hoursSinceUpdate < 24) {
                 return false;
